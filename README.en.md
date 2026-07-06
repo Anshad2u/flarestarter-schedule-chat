@@ -91,15 +91,19 @@ Dark-first design with a terminal aesthetic. Every shot below is a real running 
 # 1. Install
 pnpm install
 
-# 2. Configure local env (copy the example and fill in what you need)
+# 2. Create your local Wrangler config (holds D1/KV ids etc.; git-ignored,
+#    the reference template is committed)
+cp wrangler.example.jsonc wrangler.jsonc
+
+# 3. Configure local env (copy the example and fill in what you need)
 cp .dev.vars.example .dev.vars
 #    Everything is optional locally — blank Stripe/Resend keys degrade
 #    gracefully (no billing, console-captured emails).
 
-# 3. Create the local D1 schema
+# 4. Create the local D1 schema
 pnpm db:migrate:local
 
-# 4. Run it
+# 5. Run it
 pnpm dev          # http://localhost:3000
 ```
 

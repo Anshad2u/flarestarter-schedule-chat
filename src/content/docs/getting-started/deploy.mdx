@@ -11,6 +11,8 @@ title: "部署到 Cloudflare"
   注册。
 - 已在本地跑通(见 [本地安装与启动](/docs/getting-started/install))。
 - 本项目自带 `wrangler`(Cloudflare 的命令行工具),用 `npx wrangler` 调用,无需单独安装。
+- 已生成本地 Wrangler 配置:`cp wrangler.example.jsonc wrangler.jsonc`。`wrangler.jsonc`
+  含真实资源 id,已被 git 忽略;仓库里提交的是占位模板 `wrangler.example.jsonc`。
 
 ## 1. 登录 Cloudflare
 

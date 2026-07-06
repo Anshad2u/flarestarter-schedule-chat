@@ -19,6 +19,10 @@ todos.json
 .prod.vars
 .staging.vars
 
+# 本地 Wrangler 配置（含真实 D1/KV id、自定义域名）——不入库；
+# 模板参考见提交的 wrangler.example.jsonc，首次 `cp wrangler.example.jsonc wrangler.jsonc`
+wrangler.jsonc
+
 # Local-only verification screenshots (not distributed with the template)
 docs/superpowers/archive/screenshots/
 

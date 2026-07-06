@@ -1,4 +1,16 @@
 /**
+ * Template Wrangler config — COMMITTED to git as the reference.
+ *
+ * On first setup, copy this to `wrangler.jsonc` (which is git-ignored) and fill
+ * in your own values:
+ *   cp wrangler.example.jsonc wrangler.jsonc
+ *
+ * Placeholders to replace in `wrangler.jsonc` after creating your resources:
+ *   - env.{staging,production}.d1_databases[].database_id  (wrangler d1 create ...)
+ *   - env.{staging,production}.kv_namespaces[].id          (wrangler kv namespace create CACHE --env ...)
+ *   - optionally add env.production.routes for a custom domain
+ * Keep this example file in sync when you add new bindings/vars.
+ *
  * For more details on how to configure Wrangler, refer to:
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
