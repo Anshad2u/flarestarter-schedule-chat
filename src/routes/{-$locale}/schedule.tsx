@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useRef, useCallback, useMemo } from 'react'
-import { Gantt } from '@/components/reui/gantt/gantt'
-import { GanttNav, GanttToolbar } from '@/components/reui/gantt/gantt-nav'
-import type { GanttEvent, GanttResource } from '@/components/reui/gantt/gantt-types'
-import { GanttView } from '@/components/reui/gantt/gantt-view'
+import { useState, useRef, useCallback, useMemo, lazy, Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Send, Sparkles, MessageSquare } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Send, Sparkles } from 'lucide-react'
+
+/* ── Lazy-load the Gantt (client-only, avoids SSR hydration crash) ───── */
+const GanttChart = lazy(() => import('@/components/reui/gantt/gantt-chart-ssr'))
 
 export const Route = createFileRoute('/{-$locale}/schedule')({
   component: SchedulePage,
@@ -15,7 +14,7 @@ export const Route = createFileRoute('/{-$locale}/schedule')({
 
 /* ── Sample data ─────────────────────────────────────────────────────── */
 
-const initialResources: GanttResource[] = [
+const initialResources = [
   {
     id: 'planning',
     title: '📋 Planning',
@@ -49,25 +48,21 @@ const initialResources: GanttResource[] = [
     children: [
       { id: 'testing', title: 'QA testing' },
       { id: 'deploy', title: 'Deployment' },
-      {id: 'marketing', title: 'Marketing push' },
+      { id: 'marketing', title: 'Marketing push' },
     ],
   },
 ]
 
-const initialEvents: GanttEvent[] = [
-  // Planning
+const initialEvents = [
   { id: 'e1', title: 'Market research', start: new Date('2026-07-21'), end: new Date('2026-07-25'), allDay: true, resourceId: 'research', color: 'var(--color-blue-500)', progress: 80 },
   { id: 'e2', title: 'Gather requirements', start: new Date('2026-07-24'), end: new Date('2026-07-28'), allDay: true, resourceId: 'requirements', color: 'var(--color-blue-500)', progress: 40 },
   { id: 'e3', title: 'Define timeline', start: new Date('2026-07-28'), end: new Date('2026-07-30'), allDay: true, resourceId: 'timeline', color: 'var(--color-blue-500)', progress: 0 },
-  // Design
   { id: 'e4', title: 'Wireframes', start: new Date('2026-07-28'), end: new Date('2026-08-01'), allDay: true, resourceId: 'wireframes', color: 'var(--color-purple-500)', progress: 20 },
   { id: 'e5', title: 'UI mockups', start: new Date('2026-08-01'), end: new Date('2026-08-06'), allDay: true, resourceId: 'mockups', color: 'var(--color-purple-500)', progress: 0 },
   { id: 'e6', title: 'Prototype', start: new Date('2026-08-05'), end: new Date('2026-08-08'), allDay: true, resourceId: 'prototype', color: 'var(--color-purple-500)', progress: 0 },
-  // Development
   { id: 'e7', title: 'Frontend build', start: new Date('2026-08-04'), end: new Date('2026-08-15'), allDay: true, resourceId: 'frontend', color: 'var(--color-green-500)', progress: 0 },
   { id: 'e8', title: 'Backend API', start: new Date('2026-08-04'), end: new Date('2026-08-14'), allDay: true, resourceId: 'backend', color: 'var(--color-green-500)', progress: 0 },
   { id: 'e9', title: 'AI integration', start: new Date('2026-08-12'), end: new Date('2026-08-18'), allDay: true, resourceId: 'integration', color: 'var(--color-green-500)', progress: 0 },
-  // Launch
   { id: 'e10', title: 'QA testing', start: new Date('2026-08-16'), end: new Date('2026-08-20'), allDay: true, resourceId: 'testing', color: 'var(--color-orange-500)', progress: 0 },
   { id: 'e11', title: 'Deployment', start: new Date('2026-08-20'), end: new Date('2026-08-21'), allDay: true, resourceId: 'deploy', color: 'var(--color-red-500)', progress: 0 },
   { id: 'e12', title: 'Marketing push', start: new Date('2026-08-21'), end: new Date('2026-08-28'), allDay: true, resourceId: 'marketing', color: 'var(--color-orange-500)', progress: 0 },
@@ -82,11 +77,24 @@ interface ChatMessage {
   timestamp: Date
 }
 
+/* ── Loading skeleton ────────────────────────────────────────────────── */
+
+function GanttSkeleton() {
+  return (
+    <div className="flex h-full items-center justify-center">
+      <div className="text-center">
+        <div className="mb-3 inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-sm text-muted-foreground">Loading Gantt chart…</p>
+      </div>
+    </div>
+  )
+}
+
 /* ── Main page ───────────────────────────────────────────────────────── */
 
 function SchedulePage() {
-  const [events, setEvents] = useState<GanttEvent[]>(initialEvents)
-  const [resources] = useState<GanttResource[]>(initialResources)
+  const [events, setEvents] = useState(initialEvents)
+  const [resources] = useState(initialResources)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
@@ -117,7 +125,6 @@ function SchedulePage() {
     setInput('')
     setIsTyping(true)
 
-    // Placeholder AI response — will be replaced with real AI later
     setTimeout(() => {
       const assistantMsg: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
@@ -165,16 +172,14 @@ function SchedulePage() {
         <div className="flex-1 overflow-auto p-4">
           <Card className="h-full py-0">
             <CardContent className="h-full p-0">
-              <Gantt
-                defaultEvents={events}
-                resources={resources}
-                defaultScale="week"
-                onEventsChange={setEvents}
-                className="h-full w-full"
-              >
-                <GanttNav />
-                <GanttView />
-              </Gantt>
+              <Suspense fallback={<GanttSkeleton />}>
+                <GanttChart
+                  defaultEvents={events}
+                  resources={resources}
+                  defaultScale="week"
+                  onEventsChange={setEvents}
+                />
+              </Suspense>
             </CardContent>
           </Card>
         </div>
