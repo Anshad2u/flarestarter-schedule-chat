@@ -55,14 +55,6 @@
 			"migrations_dir": "drizzle"
 		}
 	],
-	// 对象存储（头像/文件上传）。本地 dev/test 由 miniflare 自动模拟，零配置即用。
-	// 部署前先建桶：`wrangler r2 bucket create flarestarter-files`（见 docs/storage.md）。
-	"r2_buckets": [
-		{
-			"binding": "BUCKET",
-			"bucket_name": "flarestarter-files"
-		}
-	],
 	"kv_namespaces": [
 		{
 			"binding": "CACHE",
@@ -130,13 +122,6 @@
 					"migrations_dir": "drizzle"
 				}
 			],
-			// 部署前先建桶：`wrangler r2 bucket create flarestarter-files-staging`。
-			"r2_buckets": [
-				{
-					"binding": "BUCKET",
-					"bucket_name": "flarestarter-files-staging"
-				}
-			],
 			"kv_namespaces": [
 				{
 					"binding": "CACHE",
@@ -157,13 +142,6 @@
 					"database_name": "flarestarter-db-prod",
 					"database_id": "00000000-0000-0000-0000-000000000000",
 					"migrations_dir": "drizzle"
-				}
-			],
-			// 部署前先建桶：`wrangler r2 bucket create flarestarter-files-prod`。
-			"r2_buckets": [
-				{
-					"binding": "BUCKET",
-					"bucket_name": "flarestarter-files-prod"
 				}
 			],
 			"kv_namespaces": [
