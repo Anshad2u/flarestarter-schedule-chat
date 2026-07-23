@@ -22,11 +22,11 @@ export const Route = createFileRoute('/{-$locale}/')({
       origin,
       locale,
       path: '/',
-      title: 'FlareStarter',
+      title: 'SoftFactory',
       description:
         locale === 'zh'
-          ? 'FlareStarter——Cloudflare 原生的 SaaS 起步模板。克隆即用，部署到 Workers。'
-          : 'FlareStarter — the Cloudflare-native SaaS starter. Clone it and ship on Workers.',
+          ? 'SoftFactory——Cloudflare 原生的 SaaS 起步模板。克隆即用，部署到 Workers。'
+          : 'SoftFactory — the Cloudflare-native SaaS starter. Clone it and ship on Workers.',
     })
     return { meta, links }
   },

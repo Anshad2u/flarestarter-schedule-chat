@@ -1,4 +1,4 @@
-/** FlareStarter wordmark — 4-point spark mark + "Flare" (bold) + "Starter" (58%). `compact` renders the mark only. */
+/** SoftFactory wordmark — 4-point spark mark + "Flare" (bold) + "Starter" (58%). `compact` renders the mark only. */
 export function Logo({ size = 18, compact = false }: { size?: number; compact?: boolean }) {
   return (
     <span

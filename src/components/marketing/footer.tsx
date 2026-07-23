@@ -4,7 +4,7 @@ import { Logo } from '@/components/brand/logo'
 import { ThemeToggle } from '@/features/theme/theme-toggle'
 import { LangSwitch } from '@/features/i18n/lang-switch'
 
-const GITHUB_URL = 'https://github.com/flarestarter/flarestarter'
+const GITHUB_URL = 'https://github.com/softfactory/softfactory'
 const TELEGRAM_URL = 'https://t.me/+coaN5Ihjte9jNzZl'
 
 export function Footer({ theme }: { theme: 'light' | 'dark' }) {

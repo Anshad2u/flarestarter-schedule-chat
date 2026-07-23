@@ -50,7 +50,7 @@ export const Route = createFileRoute('/{-$locale}/changelog')({
       origin,
       locale,
       path: '/changelog',
-      title: `${dict.changelog.title} — FlareStarter`,
+      title: `${dict.changelog.title} — SoftFactory`,
       description: dict.changelog.subtitle,
     })
     return { meta, links }
