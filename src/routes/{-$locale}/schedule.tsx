@@ -1,5 +1,4 @@
-"use client"
-
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useCallback, useEffect } from 'react'
 import { Send, Bot, User, PanelLeftClose, PanelLeft } from 'lucide-react'
 import { ClientOnly } from '@/components/client-only'
@@ -7,6 +6,10 @@ import { TamboSetupProvider } from '@/components/tambo/tambo-provider'
 import { GanttChart } from '@/components/gantt'
 import type { GanttTask, GanttGroup, GanttMarker } from '@/components/gantt'
 import { addDays, subDays } from '@/components/gantt/utils'
+
+export const Route = createFileRoute('/{-$locale}/schedule')({
+  component: SchedulePage,
+})
 
 /* ── Sample data ────────────────────────────────────────────────────── */
 
