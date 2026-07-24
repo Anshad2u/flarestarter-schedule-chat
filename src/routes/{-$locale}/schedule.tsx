@@ -1,10 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef, useCallback, useMemo } from 'react'
 import { ClientOnly } from '@/components/client-only'
-import { Gantt } from '@/components/reui/gantt/gantt'
-import { GanttNav } from '@/components/reui/gantt/gantt-nav'
-import type { GanttEvent, GanttResource } from '@/components/reui/gantt/gantt-types'
-import { GanttView } from '@/components/reui/gantt/gantt-view'
+import { GanttChart, type GanttTask, type GanttGroup } from '@/components/gantt/gantt-chart'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -16,58 +13,26 @@ export const Route = createFileRoute('/{-$locale}/schedule')({
 
 /* ── Sample data ─────────────────────────────────────────────────────── */
 
-const initialResources: GanttResource[] = [
-  {
-    id: 'planning',
-    title: '📋 Planning',
-    children: [
-      { id: 'research', title: 'Market research' },
-      { id: 'requirements', title: 'Gather requirements' },
-      { id: 'timeline', title: 'Define timeline' },
-    ],
-  },
-  {
-    id: 'design',
-    title: '🎨 Design',
-    children: [
-      { id: 'wireframes', title: 'Wireframes' },
-      { id: 'mockups', title: 'UI mockups' },
-      { id: 'prototype', title: 'Prototype' },
-    ],
-  },
-  {
-    id: 'development',
-    title: '💻 Development',
-    children: [
-      { id: 'frontend', title: 'Frontend build' },
-      { id: 'backend', title: 'Backend API' },
-      { id: 'integration', title: 'AI integration' },
-    ],
-  },
-  {
-    id: 'launch',
-    title: '🚀 Launch',
-    children: [
-      { id: 'testing', title: 'QA testing' },
-      { id: 'deploy', title: 'Deployment' },
-      { id: 'marketing', title: 'Marketing push' },
-    ],
-  },
+const groups: GanttGroup[] = [
+  { id: 'planning', title: '📋 Planning' },
+  { id: 'design', title: '🎨 Design' },
+  { id: 'development', title: '💻 Development' },
+  { id: 'launch', title: '🚀 Launch' },
 ]
 
-const initialEvents: GanttEvent[] = [
-  { id: 'e1', title: 'Market research', start: new Date('2026-07-21'), end: new Date('2026-07-25'), allDay: true, resourceId: 'research', color: 'var(--color-blue-500)', progress: 80 },
-  { id: 'e2', title: 'Gather requirements', start: new Date('2026-07-24'), end: new Date('2026-07-28'), allDay: true, resourceId: 'requirements', color: 'var(--color-blue-500)', progress: 40 },
-  { id: 'e3', title: 'Define timeline', start: new Date('2026-07-28'), end: new Date('2026-07-30'), allDay: true, resourceId: 'timeline', color: 'var(--color-blue-500)', progress: 0 },
-  { id: 'e4', title: 'Wireframes', start: new Date('2026-07-28'), end: new Date('2026-08-01'), allDay: true, resourceId: 'wireframes', color: 'var(--color-purple-500)', progress: 20 },
-  { id: 'e5', title: 'UI mockups', start: new Date('2026-08-01'), end: new Date('2026-08-06'), allDay: true, resourceId: 'mockups', color: 'var(--color-purple-500)', progress: 0 },
-  { id: 'e6', title: 'Prototype', start: new Date('2026-08-05'), end: new Date('2026-08-08'), allDay: true, resourceId: 'prototype', color: 'var(--color-purple-500)', progress: 0 },
-  { id: 'e7', title: 'Frontend build', start: new Date('2026-08-04'), end: new Date('2026-08-15'), allDay: true, resourceId: 'frontend', color: 'var(--color-green-500)', progress: 0 },
-  { id: 'e8', title: 'Backend API', start: new Date('2026-08-04'), end: new Date('2026-08-14'), allDay: true, resourceId: 'backend', color: 'var(--color-green-500)', progress: 0 },
-  { id: 'e9', title: 'AI integration', start: new Date('2026-08-12'), end: new Date('2026-08-18'), allDay: true, resourceId: 'integration', color: 'var(--color-green-500)', progress: 0 },
-  { id: 'e10', title: 'QA testing', start: new Date('2026-08-16'), end: new Date('2026-08-20'), allDay: true, resourceId: 'testing', color: 'var(--color-orange-500)', progress: 0 },
-  { id: 'e11', title: 'Deployment', start: new Date('2026-08-20'), end: new Date('2026-08-21'), allDay: true, resourceId: 'deploy', color: 'var(--color-red-500)', progress: 0 },
-  { id: 'e12', title: 'Marketing push', start: new Date('2026-08-21'), end: new Date('2026-08-28'), allDay: true, resourceId: 'marketing', color: 'var(--color-orange-500)', progress: 0 },
+const initialTasks: GanttTask[] = [
+  { id: 'e1', title: 'Market research', start: new Date('2026-07-21'), end: new Date('2026-07-25'), groupId: 'planning', color: '#3b82f6', progress: 80 },
+  { id: 'e2', title: 'Gather requirements', start: new Date('2026-07-24'), end: new Date('2026-07-28'), groupId: 'planning', color: '#3b82f6', progress: 40 },
+  { id: 'e3', title: 'Define timeline', start: new Date('2026-07-28'), end: new Date('2026-07-30'), groupId: 'planning', color: '#3b82f6', progress: 0 },
+  { id: 'e4', title: 'Wireframes', start: new Date('2026-07-28'), end: new Date('2026-08-01'), groupId: 'design', color: '#a855f7', progress: 20 },
+  { id: 'e5', title: 'UI mockups', start: new Date('2026-08-01'), end: new Date('2026-08-06'), groupId: 'design', color: '#a855f7', progress: 0 },
+  { id: 'e6', title: 'Prototype', start: new Date('2026-08-05'), end: new Date('2026-08-08'), groupId: 'design', color: '#a855f7', progress: 0 },
+  { id: 'e7', title: 'Frontend build', start: new Date('2026-08-04'), end: new Date('2026-08-15'), groupId: 'development', color: '#22c55e', progress: 0 },
+  { id: 'e8', title: 'Backend API', start: new Date('2026-08-04'), end: new Date('2026-08-14'), groupId: 'development', color: '#22c55e', progress: 0 },
+  { id: 'e9', title: 'AI integration', start: new Date('2026-08-12'), end: new Date('2026-08-18'), groupId: 'development', color: '#22c55e', progress: 0 },
+  { id: 'e10', title: 'QA testing', start: new Date('2026-08-16'), end: new Date('2026-08-20'), groupId: 'launch', color: '#f97316', progress: 0 },
+  { id: 'e11', title: 'Deployment', start: new Date('2026-08-20'), end: new Date('2026-08-21'), groupId: 'launch', color: '#ef4444', progress: 0 },
+  { id: 'e12', title: 'Marketing push', start: new Date('2026-08-21'), end: new Date('2026-08-28'), groupId: 'launch', color: '#f97316', progress: 0 },
 ]
 
 /* ── Chat messages type ──────────────────────────────────────────────── */
@@ -82,8 +47,7 @@ interface ChatMessage {
 /* ── Main page ───────────────────────────────────────────────────────── */
 
 function SchedulePage() {
-  const [events, setEvents] = useState<GanttEvent[]>(initialEvents)
-  const [resources] = useState<GanttResource[]>(initialResources)
+  const [tasks, setTasks] = useState<GanttTask[]>(initialTasks)
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
@@ -118,7 +82,7 @@ function SchedulePage() {
       const assistantMsg: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         role: 'assistant',
-        content: `I received your request: "${userMsg.content}"\n\n🚧 AI integration coming soon! For now, this is a demo of the Gantt chart. Try dragging the bars to reschedule tasks!`,
+        content: `I received your request: "${userMsg.content}"\n\n🚧 AI integration coming soon! For now, this is a demo of the Gantt chart.`,
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, assistantMsg])
@@ -158,9 +122,9 @@ function SchedulePage() {
       {/* Main content: Gantt + Chat side by side */}
       <div className="flex flex-1 overflow-hidden">
         {/* Gantt chart — takes remaining space */}
-        <div className="flex-1 overflow-auto p-4">
-          <Card className="h-full py-0">
-            <CardContent className="h-full p-0">
+        <div className="flex-1 overflow-hidden p-4">
+          <Card className="h-full py-0 overflow-hidden">
+            <CardContent className="h-full p-0 overflow-hidden">
               <ClientOnly
                 fallback={
                   <div className="flex h-full items-center justify-center">
@@ -172,17 +136,7 @@ function SchedulePage() {
                 }
               >
                 {() => (
-                  <Gantt
-                    defaultEvents={events}
-                    resources={resources}
-                    defaultScale="week"
-                    scrollbars="native"
-                    onEventsChange={setEvents}
-                    className="h-full w-full"
-                  >
-                    <GanttNav />
-                    <GanttView />
-                  </Gantt>
+                  <GanttChart tasks={tasks} groups={groups} />
                 )}
               </ClientOnly>
             </CardContent>
