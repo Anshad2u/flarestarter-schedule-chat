@@ -176,6 +176,7 @@ function SchedulePage() {
                     defaultEvents={events}
                     resources={resources}
                     defaultScale="week"
+                    scrollbars="native"
                     onEventsChange={setEvents}
                     className="h-full w-full"
                   >
