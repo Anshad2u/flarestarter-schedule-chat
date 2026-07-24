@@ -18,7 +18,6 @@ import { Route as Char123LocaleChar125IndexRouteImport } from './routes/{-$local
 import { Route as Char123LocaleChar125WaitlistRouteImport } from './routes/{-$locale}/waitlist'
 import { Route as Char123LocaleChar125TermsRouteImport } from './routes/{-$locale}/terms'
 import { Route as Char123LocaleChar125SponsorRouteImport } from './routes/{-$locale}/sponsor'
-import { Route as Char123LocaleChar125ScheduleRouteImport } from './routes/{-$locale}/schedule'
 import { Route as Char123LocaleChar125PrivacyRouteImport } from './routes/{-$locale}/privacy'
 import { Route as Char123LocaleChar125PricingRouteImport } from './routes/{-$locale}/pricing'
 import { Route as Char123LocaleChar125ChangelogRouteImport } from './routes/{-$locale}/changelog'
@@ -94,12 +93,6 @@ const Char123LocaleChar125SponsorRoute =
   Char123LocaleChar125SponsorRouteImport.update({
     id: '/sponsor',
     path: '/sponsor',
-    getParentRoute: () => Char123LocaleChar125RouteRoute,
-  } as any)
-const Char123LocaleChar125ScheduleRoute =
-  Char123LocaleChar125ScheduleRouteImport.update({
-    id: '/schedule',
-    path: '/schedule',
     getParentRoute: () => Char123LocaleChar125RouteRoute,
   } as any)
 const Char123LocaleChar125PrivacyRoute =
@@ -266,7 +259,6 @@ export interface FileRoutesByFullPath {
   '/{-$locale}/changelog': typeof Char123LocaleChar125ChangelogRoute
   '/{-$locale}/pricing': typeof Char123LocaleChar125PricingRoute
   '/{-$locale}/privacy': typeof Char123LocaleChar125PrivacyRoute
-  '/{-$locale}/schedule': typeof Char123LocaleChar125ScheduleRoute
   '/{-$locale}/sponsor': typeof Char123LocaleChar125SponsorRoute
   '/{-$locale}/terms': typeof Char123LocaleChar125TermsRoute
   '/{-$locale}/waitlist': typeof Char123LocaleChar125WaitlistRoute
@@ -302,7 +294,6 @@ export interface FileRoutesByTo {
   '/{-$locale}/changelog': typeof Char123LocaleChar125ChangelogRoute
   '/{-$locale}/pricing': typeof Char123LocaleChar125PricingRoute
   '/{-$locale}/privacy': typeof Char123LocaleChar125PrivacyRoute
-  '/{-$locale}/schedule': typeof Char123LocaleChar125ScheduleRoute
   '/{-$locale}/sponsor': typeof Char123LocaleChar125SponsorRoute
   '/{-$locale}/terms': typeof Char123LocaleChar125TermsRoute
   '/{-$locale}/waitlist': typeof Char123LocaleChar125WaitlistRoute
@@ -341,7 +332,6 @@ export interface FileRoutesById {
   '/{-$locale}/changelog': typeof Char123LocaleChar125ChangelogRoute
   '/{-$locale}/pricing': typeof Char123LocaleChar125PricingRoute
   '/{-$locale}/privacy': typeof Char123LocaleChar125PrivacyRoute
-  '/{-$locale}/schedule': typeof Char123LocaleChar125ScheduleRoute
   '/{-$locale}/sponsor': typeof Char123LocaleChar125SponsorRoute
   '/{-$locale}/terms': typeof Char123LocaleChar125TermsRoute
   '/{-$locale}/waitlist': typeof Char123LocaleChar125WaitlistRoute
@@ -381,7 +371,6 @@ export interface FileRouteTypes {
     | '/{-$locale}/changelog'
     | '/{-$locale}/pricing'
     | '/{-$locale}/privacy'
-    | '/{-$locale}/schedule'
     | '/{-$locale}/sponsor'
     | '/{-$locale}/terms'
     | '/{-$locale}/waitlist'
@@ -417,7 +406,6 @@ export interface FileRouteTypes {
     | '/{-$locale}/changelog'
     | '/{-$locale}/pricing'
     | '/{-$locale}/privacy'
-    | '/{-$locale}/schedule'
     | '/{-$locale}/sponsor'
     | '/{-$locale}/terms'
     | '/{-$locale}/waitlist'
@@ -455,7 +443,6 @@ export interface FileRouteTypes {
     | '/{-$locale}/changelog'
     | '/{-$locale}/pricing'
     | '/{-$locale}/privacy'
-    | '/{-$locale}/schedule'
     | '/{-$locale}/sponsor'
     | '/{-$locale}/terms'
     | '/{-$locale}/waitlist'
@@ -558,13 +545,6 @@ declare module '@tanstack/react-router' {
       path: '/sponsor'
       fullPath: '/{-$locale}/sponsor'
       preLoaderRoute: typeof Char123LocaleChar125SponsorRouteImport
-      parentRoute: typeof Char123LocaleChar125RouteRoute
-    }
-    '/{-$locale}/schedule': {
-      id: '/{-$locale}/schedule'
-      path: '/schedule'
-      fullPath: '/{-$locale}/schedule'
-      preLoaderRoute: typeof Char123LocaleChar125ScheduleRouteImport
       parentRoute: typeof Char123LocaleChar125RouteRoute
     }
     '/{-$locale}/privacy': {
@@ -782,7 +762,6 @@ interface Char123LocaleChar125RouteRouteChildren {
   Char123LocaleChar125ChangelogRoute: typeof Char123LocaleChar125ChangelogRoute
   Char123LocaleChar125PricingRoute: typeof Char123LocaleChar125PricingRoute
   Char123LocaleChar125PrivacyRoute: typeof Char123LocaleChar125PrivacyRoute
-  Char123LocaleChar125ScheduleRoute: typeof Char123LocaleChar125ScheduleRoute
   Char123LocaleChar125SponsorRoute: typeof Char123LocaleChar125SponsorRoute
   Char123LocaleChar125TermsRoute: typeof Char123LocaleChar125TermsRoute
   Char123LocaleChar125WaitlistRoute: typeof Char123LocaleChar125WaitlistRoute
@@ -805,7 +784,6 @@ const Char123LocaleChar125RouteRouteChildren: Char123LocaleChar125RouteRouteChil
     Char123LocaleChar125ChangelogRoute: Char123LocaleChar125ChangelogRoute,
     Char123LocaleChar125PricingRoute: Char123LocaleChar125PricingRoute,
     Char123LocaleChar125PrivacyRoute: Char123LocaleChar125PrivacyRoute,
-    Char123LocaleChar125ScheduleRoute: Char123LocaleChar125ScheduleRoute,
     Char123LocaleChar125SponsorRoute: Char123LocaleChar125SponsorRoute,
     Char123LocaleChar125TermsRoute: Char123LocaleChar125TermsRoute,
     Char123LocaleChar125WaitlistRoute: Char123LocaleChar125WaitlistRoute,
