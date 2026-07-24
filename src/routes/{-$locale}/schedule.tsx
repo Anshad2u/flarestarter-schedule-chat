@@ -157,14 +157,16 @@ export default function SchedulePage() {
               </div>
             }
           >
-            <GanttChart
-              tasks={tasks}
-              groups={groups}
-              markers={markers}
-              view="week"
-              onTaskUpdate={handleTaskUpdate}
-              onTaskClick={(id) => console.log('clicked', id)}
-            />
+            {() => (
+              <GanttChart
+                tasks={tasks}
+                groups={groups}
+                markers={markers}
+                view="week"
+                onTaskUpdate={handleTaskUpdate}
+                onTaskClick={(id) => console.log('clicked', id)}
+              />
+            )}
           </ClientOnly>
         </div>
 
