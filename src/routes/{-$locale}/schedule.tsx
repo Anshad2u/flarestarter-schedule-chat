@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Send, Bot, User, PanelLeftClose, PanelLeft } from 'lucide-react'
 import { ClientOnly } from '@/components/client-only'
 import { TamboSetupProvider } from '@/components/tambo/tambo-provider'
 import { GanttChart } from '@/components/gantt'
 import type { GanttTask, GanttGroup, GanttMarker } from '@/components/gantt'
 import { addDays, subDays } from '@/components/gantt/utils'
+import { createAndAdvance, advanceThread, getLastAssistantText } from '@/lib/tambo'
 
 export const Route = createFileRoute('/{-$locale}/schedule')({
   component: SchedulePage,
@@ -40,6 +41,20 @@ const SAMPLE_MARKERS: GanttMarker[] = [
   { id: 'm2', date: addDays(new Date(), 15), label: 'Sprint Review', color: '#f59e0b' },
 ]
 
+/* ── Tambo system prompt ────────────────────────────────────────────── */
+
+const SYSTEM_PROMPT = `You are a project management assistant that helps manage Gantt charts.
+You can help with:
+- Adding, removing, or reordering tasks
+- Changing task dates, durations, progress, and assignments
+- Organizing tasks into groups (phases)
+- Scheduling sprints and milestones
+
+Current project has these groups: Design Phase, Development, Testing & QA, Launch.
+
+When the user asks you to make changes, confirm what you understood and describe
+the action clearly. Be concise and helpful.`
+
 /* ── Chat message type ──────────────────────────────────────────────── */
 
 interface ChatMessage {
@@ -64,6 +79,13 @@ export default function SchedulePage() {
   ])
   const [input, setInput] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
+  const threadIdRef = useRef<string | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll chat
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   /* ── Task update handler ────────────────────────────────────────── */
 
@@ -78,69 +100,60 @@ export default function SchedulePage() {
 
   /* ── Chat send ──────────────────────────────────────────────────── */
 
-  const sendMessage = useCallback(() => {
+  const sendMessage = useCallback(async () => {
     const text = input.trim()
     if (!text) return
+
+    const apiKey = import.meta.env.VITE_TAMBO_API_KEY as string | undefined
+    if (!apiKey) {
+      const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', content: text }
+      setMessages((prev) => [...prev, userMsg, {
+        id: `a-${Date.now()}`,
+        role: 'assistant',
+        content: '⚠️ Tambo API key not configured. Set VITE_TAMBO_API_KEY environment variable.',
+      }])
+      setInput('')
+      return
+    }
 
     const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', content: text }
     setMessages((prev) => [...prev, userMsg])
     setInput('')
     setIsProcessing(true)
 
-    // Simulate AI processing (will be replaced with Tambo agent)
-    setTimeout(() => {
-      const lower = text.toLowerCase()
-      let response = ''
+    try {
+      let assistantText: string
 
-      if (lower.includes('add') && lower.includes('task')) {
-        // Extract task name from input
-        const nameMatch = text.match(/(?:called|named|called)\s+['""](.+?)['""]|['""](.+?)['""]/i)
-        const taskName = nameMatch?.[1] || nameMatch?.[2] || text.replace(/.*add.*task/i, '').trim()
-
-        if (taskName) {
-          const newTask: GanttTask = {
-            id: `t-${Date.now()}`,
-            title: taskName.slice(0, 40),
-            start: new Date(),
-            end: addDays(new Date(), 7),
-            progress: 0,
-            color: '#6366f1',
-            groupId: 'dev',
-          }
-          setTasks((prev) => [...prev, newTask])
-          response = `✅ Added task **"${newTask.title}"** to Development, starting today for 7 days.`
-        } else {
-          response = "I'd like to add a task, but what should I call it? Try: Add a task called \"Task Name\""
-        }
-      } else if (lower.includes('delete') || lower.includes('remove')) {
-        const task = tasks.find((t) => lower.includes(t.title.toLowerCase()))
-        if (task) {
-          setTasks((prev) => prev.filter((t) => t.id !== task.id))
-          response = `🗑️ Removed task **"${task.title}"**.`
-        } else {
-          response = "I couldn't find a matching task to remove. Which task should I delete?"
-        }
-      } else if (lower.includes('progress') || lower.includes('complete')) {
-        const pctMatch = text.match(/(\d+)\s*%?/)
-        const pct = pctMatch ? parseInt(pctMatch[1]) : 100
-        const task = tasks.find((t) => lower.includes(t.title.toLowerCase()))
-        if (task) {
-          handleTaskUpdate(task.id, { progress: Math.min(100, pct) })
-          response = `📊 Updated **"${task.title}"** progress to ${Math.min(100, pct)}%.`
-        } else {
-          response = "Which task should I update? I couldn't find a match."
-        }
+      if (threadIdRef.current) {
+        // Continue existing thread
+        const msgs = await advanceThread(apiKey, threadIdRef.current, text)
+        assistantText = getLastAssistantText(msgs) || 'No response from assistant.'
       } else {
-        response = `I understood you said: "${text}"\n\nCurrently I can:\n• **Add tasks**: "Add a task called X"\n• **Remove tasks**: "Remove task X"\n• **Update progress**: "Set X to 50% complete"\n\nMore commands coming soon with Tambo integration! 🚀`
+        // First message — create thread with system context
+        const fullMessage = `${SYSTEM_PROMPT}\n\n---\n\nUser: ${text}`
+        const { threadId, msgs } = await createAndAdvance(apiKey, fullMessage)
+        threadIdRef.current = threadId
+        assistantText = getLastAssistantText(msgs) || 'No response from assistant.'
       }
 
       setMessages((prev) => [
         ...prev,
-        { id: `a-${Date.now()}`, role: 'assistant', content: response },
+        { id: `a-${Date.now()}`, role: 'assistant', content: assistantText },
       ])
+    } catch (err) {
+      console.error('Tambo API error:', err)
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `a-${Date.now()}`,
+          role: 'assistant',
+          content: `❌ Error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        },
+      ])
+    } finally {
       setIsProcessing(false)
-    }, 800)
-  }, [input, tasks, handleTaskUpdate])
+    }
+  }, [input])
 
   /* ── Render ──────────────────────────────────────────────────────── */
 
@@ -227,6 +240,7 @@ export default function SchedulePage() {
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Input */}

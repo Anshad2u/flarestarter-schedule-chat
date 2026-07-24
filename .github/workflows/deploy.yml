@@ -45,6 +45,7 @@ jobs:
         run: pnpm build
         env:
           CLOUDFLARE_ENV: production
+          VITE_TAMBO_API_KEY: ${{ secrets.VITE_TAMBO_API_KEY }}
       - name: Deploy to Cloudflare
         if: steps.guard.outputs.enabled == 'true'
         uses: cloudflare/wrangler-action@v4
