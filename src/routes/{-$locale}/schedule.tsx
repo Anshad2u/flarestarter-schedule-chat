@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Send, Bot, User, PanelLeftClose, PanelLeft } from 'lucide-react'
 import { ClientOnly } from '@/components/client-only'
+import { TamboSetupProvider } from '@/components/tambo/tambo-provider'
 import { GanttChart } from '@/components/gantt'
 import type { GanttTask, GanttGroup, GanttMarker } from '@/components/gantt'
 import { addDays, subDays } from '@/components/gantt/utils'
@@ -141,6 +142,7 @@ export default function SchedulePage() {
   /* ── Render ──────────────────────────────────────────────────────── */
 
   return (
+    <TamboSetupProvider>
     <div className="flex h-[calc(100dvh-4rem)] flex-col overflow-hidden">
       {/* ── Gantt area ────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
@@ -263,5 +265,6 @@ export default function SchedulePage() {
         </button>
       )}
     </div>
+    </TamboSetupProvider>
   )
 }
