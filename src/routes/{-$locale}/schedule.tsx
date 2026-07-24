@@ -3,7 +3,8 @@ import { useState, useCallback, useMemo } from 'react'
 import { ClientOnly } from '@/components/client-only'
 import { Gantt } from '@/components/reui/gantt/gantt'
 import { GanttNav, GanttToolbar } from '@/components/reui/gantt/gantt-nav'
-import type { GanttEvent, GanttResource, GanttColumnContext } from '@/components/reui/gantt/gantt-types'
+import type { GanttEvent, GanttResource } from '@/components/reui/gantt/gantt-types'
+import type { GanttColumn } from '@/components/reui/gantt/gantt'
 import { GanttView } from '@/components/reui/gantt/gantt-view'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -77,45 +78,7 @@ const initialEvents: GanttEvent[] = [
 
 /* ── Tree columns ────────────────────────────────────────────────────── */
 
-const treeColumns: GanttColumn[] = [
-  {
-    id: 'status',
-    title: 'Status',
-    width: 80,
-    align: 'center',
-    render: ({ resource }: GanttColumnContext) => {
-      if (resource.children && resource.children.length > 0) return null
-      return <span className="text-xs text-muted-foreground">—</span>
-    },
-  },
-  {
-    id: 'duration',
-    title: 'Duration',
-    width: 90,
-    align: 'center',
-    render: ({ resource, events }: GanttColumnContext) => {
-      if (!events.length) return null
-      const ev = events[0]
-      const days = Math.ceil((ev.end.getTime() - ev.start.getTime()) / (1000 * 60 * 60 * 24))
-      return <span className="text-xs tabular-nums">{days}d</span>
-    },
-  },
-  {
-    id: 'assignee',
-    title: 'Assignee',
-    width: 100,
-    render: ({ resource }: GanttColumnContext) => {
-      if (resource.children && resource.children.length > 0) return null
-      const names: Record<string, string> = {
-        research: 'Alice', requirements: 'Bob', timeline: 'Carol',
-        wireframes: 'Dave', mockups: 'Eve', prototype: 'Frank',
-        frontend: 'Grace', backend: 'Heidi', integration: 'Ivan',
-        testing: 'Judy', deploy: 'Karl', marketing: 'Leo',
-      }
-      return <span className="text-xs text-muted-foreground">{names[resource.id] || '—'}</span>
-    },
-  },
-]
+const treeColumns: GanttColumn[] = []
 
 /* ── Chat messages type ──────────────────────────────────────────────── */
 
@@ -261,7 +224,6 @@ function SchedulePage() {
                     defaultScale="week"
                     scrollbars="native"
                     onEventsChange={setEvents}
-                    columns={treeColumns}
                     rowCheckboxes={true}
                     zoomControl={true}
                     offscreenIndicators={true}
